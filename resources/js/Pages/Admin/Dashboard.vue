@@ -1,6 +1,13 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
+import axios from '@/libs/axios';
+
+const testApi = async () => {
+    await axios.post(route('admin.dashboard.post'), {
+        'a' : 'haha'
+    });
+}
 </script>
 
 <template>
@@ -17,6 +24,7 @@ import { Head } from '@inertiajs/vue3';
                     <div class="p-6 text-gray-900">You're logged in!</div>
                 </div>
             </div>
+            
         </div>
     </AuthenticatedLayout>
 </template>
