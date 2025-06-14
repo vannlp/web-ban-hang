@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { usePage } from '@inertiajs/vue3'
 import toastManager from './toast'
+import loadingManager from './LoadingManager'
 
 // Tạo instance
 const axiosInstance = axios.create({
@@ -22,8 +23,28 @@ axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
 axiosInstance.interceptors.response.use(
   response => response,
   error => {
-    console.error('Axios error:', error)
-    toastManager.error("Có lỗi xảy ra");
+    // xử lý lỗi validate 
+    let message = '';
+    let status = error?.status;
+    if(status == 422) {
+      let errors = error?.response?.data?.errors;
+      if(errors) {
+        let messages = Object.values(errors).flat();
+        
+        message = messages.join(', ');
+        
+        toastManager.error(message);
+        
+      }
+      loadingManager.hide();
+      return Promise.reject(error)
+    } 
+    
+    
+    message = error?.response?.data?.message;
+    // console.error('Axios error:', message)
+    loadingManager.hide();
+    toastManager.error(message);
     return Promise.reject(error)
   }
 )

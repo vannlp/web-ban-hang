@@ -19,7 +19,13 @@
     },
     "dependencies": {
         "@mdi/font": "^7.4.47",
+        "@tinymce/tinymce-vue": "^4.0.7",
+        "datatables.net": "^2.3.0",
+        "datatables.net-dt": "^2.3.0",
+        "datatables.net-vue3": "^3.0.4",
+        "lodash": "^4.17.21",
         "sass": "^1.87.0",
+        "tinymce": "^7.9.1",
         "vite-plugin-vuetify": "^2.1.1",
         "vue3-easy-data-table": "^1.5.47",
         "vuetify": "^3.8.2",
