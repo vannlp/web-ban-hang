@@ -12,6 +12,7 @@
     clearable
     hide-no-data
     hide-details
+    no-filter
   />
 </template>
 
@@ -50,34 +51,42 @@ const props = defineProps({
     type: Number,
     default: 300,
   },
+  params: {
+    type: Object,
+    default: () => ({}),
+  },
 })
 
 // Emits
 const emit = defineEmits(['update:modelValue'])
 
 // State
-const model = ref([...props.modelValue])
+const model = ref(props.modelValue)
 const items = ref([])
 const search = ref('')
 const loading = ref(false)
 
 // Đồng bộ modelValue vào trong component
 watch(() => props.modelValue, (val) => {
-  model.value = [...val]
+  model.value = val
 })
+
 watch(model, (val) => {
   emit('update:modelValue', val)
 })
 
+
+
 // Hàm gọi API
-const fetchOptions = async (query = '', preloadIds = []) => {
+const fetchOptions = async (query = '', preloadIds = [], params = {}) => {
+  
   loading.value = true
   try {
     const { data } = await axiosInstance.get(props.apiUrl, {
       params: {
         search: query,
-        preload: preloadIds.join(','),
-        ...props.extraParams,
+        orListId: preloadIds,
+        ...props.extraParams
       },
     })
     items.value = data.data
@@ -89,19 +98,20 @@ const fetchOptions = async (query = '', preloadIds = []) => {
   }
 }
 
-// Debounced version
-const debouncedFetch = debounce((val) => {
-  fetchOptions(val)
+const debouncedFetch = debounce((val, preloadIds = [], params = {}) => {
+  fetchOptions(val, preloadIds, params)
 }, props.debounceDelay)
+
 
 // Khi search thay đổi => gọi debounce
 watch(search, (val) => {
   if (!val) return
-  debouncedFetch(val)
+
+  debouncedFetch(val, model.value, props.params)
 })
 
 // Gọi lần đầu khi mounted
 onMounted(() => {
-  fetchOptions('', props.modelValue)
+  fetchOptions('', props.modelValue, props.params)
 })
 </script>

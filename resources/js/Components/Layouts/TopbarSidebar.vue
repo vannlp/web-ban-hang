@@ -2,7 +2,11 @@
   <!-- Top Bar -->
   <v-app-bar app color="#fff" dark>
     <v-app-bar-nav-icon @click="$emit('toggle-drawer')" />
-    <v-toolbar-title>Web Bán Hàng</v-toolbar-title>
+    <v-toolbar-title>
+      <Link href="/">
+        Web bán hàng
+      </Link>
+    </v-toolbar-title>
     <v-spacer />
     <v-btn icon>
       <v-icon>mdi-account</v-icon>

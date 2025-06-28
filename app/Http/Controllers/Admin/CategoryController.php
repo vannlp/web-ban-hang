@@ -36,6 +36,18 @@ class CategoryController extends Controller
         return Response::success("Get dữ liệu thành công", $listCategory);
     }
     
+    public function getClient(Request $request) {
+         $input = $request->all();
+        
+        if(!empty($input['search'])) {
+            $input['name'] = $input['search'];
+        }
+        
+        $listCategory = $this->categoryRepository->getParentByClient($input)->get();
+        
+        return Response::success("Get dữ liệu thành công", $listCategory);
+    }
+    
     public function getOne(Request $request, $id) {
         if(empty($id)) {
             return Response::fail("Get dữ liệu thất bại");

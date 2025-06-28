@@ -35,11 +35,19 @@ class CategoryRepository extends Repository {
             $query->where('id', $input['id']);
         } 
         
+        if(!empty($input['orListId'])) {
+            $query->orWhereIn('id', $input['orListId']);
+        } 
+        
         if(!empty($input['slug'])) {
             $query->where('slug', $input['slug']);
         } 
             
         return $query;
+    }
+    
+    public function getParentByClient($input = []) {
+        return $this->getCategory($input)->where('parent_id', null);
     }
     
     public function getAllCol($input = []) {

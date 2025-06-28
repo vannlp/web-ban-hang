@@ -20,7 +20,16 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const localContent = ref(props.modelValue || '')
-watch(localContent, (newVal) => emit('update:modelValue', newVal))
+watch(
+  () => props.modelValue,
+  (val) => {
+    localContent.value = val
+  }
+)
+
+watch(localContent, (newVal) => {
+  emit('update:modelValue', newVal)
+})
 
 const editorInit = {
   height: 500,

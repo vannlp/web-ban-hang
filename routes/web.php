@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -17,9 +19,6 @@ use UniSharp\LaravelFilemanager\Lfm;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Admin/Home');
-});
 
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web']], function () {
     Lfm::routes();
@@ -34,5 +33,15 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/get-cities', [AddressController::class, 'getCities'])->name('getCities');
+Route::get('/get-districts', [AddressController::class, 'getDistricts'])->name('getDistricts');
+Route::get('/get-wards', [AddressController::class, 'getWard'])->name('getWard');
+Route::get('/address', [AddressController::class, 'getListAddress'])->name('address.store');
+Route::post('/address', [AddressController::class, 'store'])->name('address.listAddress');
+Route::get('/address/{id}', [AddressController::class, 'getAddress'])->name('address.getAddress');
+Route::put('/address/{id}', [AddressController::class, 'update'])->name('address.update');
+Route::put('/address/update-default/{id}', [AddressController::class, 'updateDefault'])->name('address.updateDefault');
+Route::delete('/address/{id}', [AddressController::class, 'delete'])->name('address.delete');
 
 require __DIR__.'/auth.php';

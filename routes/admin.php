@@ -21,6 +21,8 @@ Route::prefix('admin')
         // Product
         Route::get('/product', [ProductController::class, 'index'])->name('product.index');
         Route::get('/product/add', [ProductController::class, 'add'])->name('product.add');
+        Route::get('/product/datatable', [ProductController::class, 'datatable'])->name('product.datatable');
+        Route::get('/product/edit/{id}', [ProductController::class, 'edit'])->name('product.edit');
         
         // Category
         Route::get('/category', [CategoryController::class, 'index'])->name('category.index');
@@ -35,7 +37,9 @@ Route::delete('/user/{id}', [UserController::class, 'delete'])->name('user.delet
 Route::get('/user/{id}', [UserController::class, 'getUser'])->name('user.getUser');
 Route::put('/user/{id}', [UserController::class, 'update'])->name('user.update')->middleware(['auth.admin', 'role:admin']) ;
 
-Route::post('/product', [ProductController::class, 'store'])->name('product.store')->middleware(['auth.admin', 'role:admin']) ;
+Route::post('/product', [ProductController::class, 'store'])->name('product.store')->middleware(['auth.admin', 'role:admin']);
+Route::put('/product/{id}', [ProductController::class, 'update'])->name('product.update')->middleware(['auth.admin', 'role:admin']);
+Route::delete('/product/{id}', [ProductController::class, 'delete'])->name('product.delete')->middleware(['auth.admin', 'role:admin']);
 
 Route::get('/category', [CategoryController::class, 'getCategories'])->name('category.getCategories');
 Route::post('/category', [CategoryController::class, 'store'])->name('category.store');

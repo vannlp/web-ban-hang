@@ -12,6 +12,10 @@ class CategoryApi {
         return await axios.get(route('admin.category.getCategories', params));
     }
     
+    async getClient(params = {}) {
+        return await axios.get(route('client.category.getCategories', params));
+    }
+    
     async updateStatus(id, params) {
         return await axios.put(route('admin.category.update-status', {id: id}), params);
     }
