@@ -70,7 +70,50 @@ class CartController extends Controller
         }
     }
     
-    public function updateCart(Request $request) {
+    public function updateCartDetail(Request $request) {
+        $detail_id = $request->detail_id;
+        $quantity = $request->quantity ?? 1;
         
+        try {
+            DB::beginTransaction();
+            
+            $input = [
+                'detail_id' => $detail_id,
+                'quantity' => $quantity,
+            ];
+            
+            $success = $this->cartService->updateCartDetail($input);
+            
+            DB::commit();
+            
+            return Response::success("Cập nhật thành công");
+        } catch (\Throwable $th) {
+            DB::rollback();
+            Log::error("CartController::updateCartQuanlity" ,['exception' => $th]);
+            return Response::fail("Cập nhật thất bại", 500);
+        }
+    }
+    
+    public function getCart(Request $request) {
+        $cart = $this->cartService->getCart();
+        
+        return Response::success("Get dữ liệu thành công", $cart);
+    }
+    
+    public function deleteCartDetail(Request $request, $id) {
+        
+        try {
+            DB::beginTransaction();
+            
+            $success = $this->cartService->deleteCartDetail($id);
+            
+            DB::commit();
+            
+            return Response::success("Xóa  thành công");
+        } catch (\Throwable $th) {
+            DB::rollback();
+            Log::error("CartController::deleteCartDetail" ,['exception' => $th]);
+            return Response::fail("Xóa thất bại", 500);
+        }
     }
 }

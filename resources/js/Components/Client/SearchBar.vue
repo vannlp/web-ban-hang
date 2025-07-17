@@ -1,4 +1,3 @@
-<!-- SearchBar.vue -->
 <template>
   <v-text-field
     v-model="search"
@@ -9,16 +8,26 @@
     hide-details
     single-line
     class="search-bar"
-    ></v-text-field>
+    @keydown.enter="submitSearch"
+    @click:append-inner="submitSearch"
+  ></v-text-field>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
+
 const search = ref('')
+
+
+const submitSearch = () => {
+  router.visit(route('client.searchPage', { s: search.value }))
+  // search.value = '';
+}
 </script>
 
 <style scoped>
-.search-bar input:focus{
+.search-bar input:focus {
   outline: none !important;
   box-shadow: none;
 }

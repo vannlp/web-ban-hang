@@ -11,7 +11,11 @@ import DataTablesLib from 'datatables.net-dt'
 
 import { ZiggyVue } from 'ziggy-js'
 
-const vuetify = createVuetify()
+const vuetify = createVuetify({
+    icons: {
+        defaultSet: 'mdi', // 👈 dùng mdi
+    },
+})
 
 DataTable.use(DataTablesLib)
 

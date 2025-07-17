@@ -86,5 +86,11 @@ const menuItems = [
       { title: 'Danh sách', to: route('admin.user.index') },
     ]
   },
+  
+  {
+    title: 'Đơn hàng',
+    icon: 'mdi-receipt',
+    to: route('admin.order.index')
+  },
 ]
 </script>

@@ -16,7 +16,7 @@ class AuthClientController extends Controller
         return Inertia::render('Client/Login');
     }
     
-     public function handleLogin(LoginRequest $request): RedirectResponse
+    public function handleLogin(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 

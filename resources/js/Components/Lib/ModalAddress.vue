@@ -66,7 +66,7 @@ const defaultAddress = () => {
         district_id: null,
         ward_id: null,
         user_id: null,
-        is_defaut: 0
+        is_default: 0
     };
 }
 
@@ -146,6 +146,8 @@ watch(() => props.id, async (val) => {
     getCities({id: address.city_id});
     getDistricts({id: address.district_id});
     getWards({id: address.ward_id});
+    
+    modal.value = !modal.value;
 })
 
 
@@ -228,7 +230,6 @@ const close = () => {
                         @focus="handleSearchWard('','focus')"
                         no-filter
                     />
-                    
                     
                 </form>
                 

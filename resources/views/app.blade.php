@@ -18,5 +18,7 @@
     </head>
     <body class="font-sans antialiased">
         @inertia
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v23.0&appId=1924449621717834"></script>
     </body>
 </html>

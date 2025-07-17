@@ -2,7 +2,10 @@
 import axios from '@/libs/axios';
 import toastManager from '@/libs/toast';
 import ClientLayout from '@/Layouts/ClientLayout.vue';
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
+import CartApi from '@/Api/CartApi';
+import loadingManager from '@/libs/LoadingManager';
+import { Link, router } from '@inertiajs/vue3';
 // Dùng layout riêng cho trang này
 defineOptions({
   layout: ClientLayout,
@@ -15,18 +18,67 @@ const props = defineProps({
     }
 })
 
-const cartDetail = ref(props.cart?.cart_detail ?? []);
+// const cartDetail = ref(props.cart?.cart_detail ?? []);
+const cart = ref(props.cart ?? {});
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
 
-const increaseQuantity = (item) => {
-  item.quantity++
+const increaseQuantity = async (item) => {
+  item.quantity++;
+  loadingManager.show();
+  await updateCartDetail(item.id, item.quantity);
+  await getCart();
+  toastManager.success("Cập nhật thành công");
+  loadingManager.hide();
 }
 
-const decreaseQuantity = (item) => {
-  if (item.quantity > 1) item.quantity--
+const decreaseQuantity = async (item) => {
+  if (item.quantity > 1){
+    item.quantity--;
+    loadingManager.show();
+    await updateCartDetail(item.id, item.quantity);
+    await getCart();
+    toastManager.success("Cập nhật thành công");
+    loadingManager.hide();
+  }
+  
 }
+
+const updateCartDetail = async (cartDetailId, quantity) => {
+    let params = {
+        detail_id: cartDetailId,
+        quantity: quantity
+    }
+    
+    let res = await CartApi.updateCartDetail(params);
+
+}
+
+const getCart = async () => {
+    let res = await CartApi.getCart();
+    let data = res.data.data;
+    cart.value = data;
+}
+
+const deleteCartDetail = async (id) => {
+    loadingManager.show();
+    let res = await CartApi.deleteCartDetail(id);
+    toastManager.success("Xóa thành công");
+    loadingManager.hide();
+    await getCart();
+} 
+
+const hanldleRedirectCheckOut =  () => {
+    if(cart.value.cart_detail.length == 0) {
+        alert("Giỏ hàng trống!! Vui lòng chọn sản phẩm");
+        return;
+    }
+    
+    
+    router.visit(route('client.checkout'));
+}
+
 
 
 
@@ -43,7 +95,7 @@ const decreaseQuantity = (item) => {
         
         <v-card class="mt-3">
             <v-card-text>
-                <v-table v-if="cartDetail.length > 0">
+                <v-table v-if="cart?.cart_detail?.length ?? [] > 0">
                     <thead>
                         <tr class="position-relative">
                             <th class="text-left min-w-[200px]" >
@@ -64,7 +116,7 @@ const decreaseQuantity = (item) => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="" v-for="item in cartDetail" :key="item.id">
+                        <tr class="" v-for="item in cart.cart_detail ?? []" :key="item.id">
                             <td class="py-3">
                                 <v-row>
                                     <v-col cols="4">
@@ -76,14 +128,25 @@ const decreaseQuantity = (item) => {
                                         ></v-img>
                                     </v-col>
                                     <v-col cols="8">
-                                        <b>
-                                            {{item?.product?.name}}
-                                        </b>
+                                        <Link :href="route('client.product.detail', {slug: item?.product?.slug})">
+                                            <b>
+                                                {{item?.product?.name}}
+                                            </b>
+                                        </Link>
                                     </v-col>
                                 </v-row>
                                 
                             </td>
-                            <td>{{formatCurrency(item?.price)}}</td>
+                            <td>
+                                <span class="font-semibold text-red-600 mr-3">
+                                {{ formatCurrency(item?.product?.price) }}
+                                </span>
+                                
+                                <!-- Giá gốc -->
+                                <span v-if="item?.product?.original_price" class="text-gray-400 line-through">
+                                {{ formatCurrency(item?.product?.original_price) }}
+                                </span>
+                            </td>
                             <td>
                                 <!-- {{item?.quantity}} -->
                                 <!-- Nhóm tăng giảm -->
@@ -114,12 +177,29 @@ const decreaseQuantity = (item) => {
                             </td>
                             <td class="text-red-500 font-bold">{{formatCurrency(item?.final_price)}}</td>
                             <td>
-                                <v-btn size="small" variant="text" color="error">Xóa</v-btn>
+                                <v-btn size="small" variant="text" @click="deleteCartDetail(item.id)" color="error">Xóa</v-btn>
                             </td>
                         </tr>
                     </tbody>
                 </v-table>
                 <h4 class="text-xl text-red-500" v-else>Không có sản phẩm trong giỏ hàng</h4>
+            </v-card-text>
+        </v-card>
+        
+        <v-card class="mt-3">
+            <v-card-text>
+                <div class="text-right flex justify-end gap-2">
+                    <div>
+                        Tổng cộng: <b class="text-red-500 font-bold">{{ formatCurrency(cart?.total_price) }}</b>
+                        <br>
+                        Tổng sau giảm giá: <b class="text-red-500 font-bold">{{ formatCurrency(cart?.final_price) }}</b>
+                    </div>
+                    
+                    <v-btn color="red" variant="flat" @click="hanldleRedirectCheckOut">
+                        Mua hàng
+                    </v-btn>
+                    
+                </div>
             </v-card-text>
         </v-card>
     </v-container>

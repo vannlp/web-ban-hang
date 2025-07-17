@@ -25,8 +25,10 @@ Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web']], funct
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Admin/Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::post('/test-post', [HomeController::class, 'testPost'])->name('testPost');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -40,6 +42,7 @@ Route::get('/get-wards', [AddressController::class, 'getWard'])->name('getWard')
 Route::get('/address', [AddressController::class, 'getListAddress'])->name('address.store');
 Route::post('/address', [AddressController::class, 'store'])->name('address.listAddress');
 Route::get('/address/{id}', [AddressController::class, 'getAddress'])->name('address.getAddress');
+Route::get('/get-default-address', [AddressController::class, 'getAddressDefault123'])->name('address.getAddressDefault');
 Route::put('/address/{id}', [AddressController::class, 'update'])->name('address.update');
 Route::put('/address/update-default/{id}', [AddressController::class, 'updateDefault'])->name('address.updateDefault');
 Route::delete('/address/{id}', [AddressController::class, 'delete'])->name('address.delete');

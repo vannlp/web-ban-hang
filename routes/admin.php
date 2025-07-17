@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Client\OrderController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,6 +29,9 @@ Route::prefix('admin')
         Route::get('/category', [CategoryController::class, 'index'])->name('category.index');
         Route::get('/category/datatable', [CategoryController::class, 'datatable'])->name('category.datatable');
         Route::put('/category/update-status/{id}', [CategoryController::class, 'updateStatus'])->name('category.update-status');
+        
+        // Order
+        Route::get('/order', [OrderController::class, 'viewOrderAdmin'])->name('order.index');
     });
 
     
@@ -46,3 +50,5 @@ Route::post('/category', [CategoryController::class, 'store'])->name('category.s
 Route::get('/category/{id}', [CategoryController::class, 'getOne'])->name('category.getOne');
 Route::put('/category/{id}', [CategoryController::class, 'update'])->name('category.update');
 Route::delete('/category/{id}', [CategoryController::class, 'delete'])->name('category.delete')->middleware(['auth.admin', 'role:admin']) ;
+
+Route::post('/update-order-status', [OrderController::class, 'updateStatus'])->name('order.updateOrderStatus');

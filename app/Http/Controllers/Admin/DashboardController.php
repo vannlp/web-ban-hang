@@ -14,6 +14,7 @@ class DashboardController extends Controller
 {
     
     public function index(Request $request) {
+        
         return Inertia::render('Admin/Home', [
             'title' => 'Dashboard'
         ]);

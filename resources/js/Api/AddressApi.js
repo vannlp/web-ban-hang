@@ -36,8 +36,12 @@ class AddressApi {
         return await axios.get(route('address.listAddress', params));
     }
     
+    async getAddressDefault(params) {
+        return await axios.get(route('address.getAddressDefault', params));
+    }
+    
     async updateAddressDefault(id, params = {}) {
-        return await axios.put(route('address.updateDefault', {id: id, ...params}));
+        return await axios.put(route('address.updateDefault', {id: id}, params));
     }
     
     async delete(id) {

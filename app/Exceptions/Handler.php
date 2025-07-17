@@ -32,11 +32,24 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($exception instanceof ValidationException) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Dữ liệu không hợp lệ',
-                'errors' => $exception->errors(),
-            ], 422);
+            // Nếu request là API hoặc muốn JSON
+        
+            // ✅ Nếu là Inertia request thì để Laravel xử lý bình thường
+            if ($request->header('X-Inertia')) {
+                return redirect()->back()
+                    ->withErrors($exception->errors())
+                    ->withInput();
+            }
+            
+            if ($request->expectsJson() || $request->isJson() || $request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dữ liệu không hợp lệ',
+                    'errors' => $exception->errors(),
+                ], 422);
+            }
+
+            // Nếu là Inertia hoặc web thì để Laravel xử lý như mặc định
         }
 
         return parent::render($request, $exception);

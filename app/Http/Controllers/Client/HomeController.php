@@ -40,4 +40,10 @@ class HomeController extends Controller
             'title' => 'Trang chủ'
         ]);
     }
+    
+    public function testPost(Request $request) {
+        
+        
+        return redirect()->back()->with('error', 'Lỗi xảy ra!');
+    }
 }

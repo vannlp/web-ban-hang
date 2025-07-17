@@ -12,6 +12,18 @@ class CartApi {
         return await axios.post(route('client.addToCart'), params);
     }
     
+    async getCart() {
+        return await axios.get(route('client.getCart'));
+    }
+    
+    async updateCartDetail(params) {
+        return await axios.put(route('client.updateCartDetail'), params);
+    }
+    
+    async deleteCartDetail(id) {
+        return await axios.delete(route('client.deleteCartDetail', {id: id}));
+    }
+    
 }
 
 export default new CartApi;

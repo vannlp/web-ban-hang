@@ -123,16 +123,15 @@ class ProductService {
         
         if(isset($data['listCategory']) && count($data['listCategory']) > 0) {
             $product_id = $this->product->id;
-            $listProductCategory = CategoryProduct::where('product_id', $product_id)->get();
+            $listProductCategory = CategoryProduct::where('product_id', $product_id)->delete();
             
             foreach($data['listCategory'] as $item) {
                 $category_id = $item;
-                $PT = $listProductCategory->where('category_id', $category_id)->first();
                 $dataPC = [
                     'product_id' => $product_id,
                     'category_id' => $category_id,
                 ];
-                $this->createOrUpdateCategoryProduct($PT, $dataPC);
+                $this->createOrUpdateCategoryProduct(null, $dataPC);
             }
         }
         

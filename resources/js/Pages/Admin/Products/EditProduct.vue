@@ -127,8 +127,6 @@ onMounted(() => {
   Object.assign(selectedItemBard, listBard);
 })
 
-
-
 </script>
 
 <template>

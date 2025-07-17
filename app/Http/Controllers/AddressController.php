@@ -8,6 +8,7 @@ use App\Models\Address;
 use App\Models\City;
 use App\Models\District;
 use App\Models\Ward;
+use App\Services\CartService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,6 +20,13 @@ use Inertia\Inertia;
 
 class AddressController extends Controller
 {
+    protected $cartService;
+    
+    public function __construct()
+    {
+        $this->cartService = new CartService();
+    }
+    
     public function getCities(Request $request) {
         $search = $request->input('search');
         $limit = $request->input('limit', 10);
@@ -103,7 +111,7 @@ class AddressController extends Controller
             'district_id' => ['required'],
             'ward_id' => ['required'],
             'user_id' => ['required'],
-            'is_defaut' => ['required', 'in:0,1'],
+            'is_default' => ['required', 'in:0,1'],
         ], [
             'required' => 'Trường :attribute là bắt buộc',
             'in' => 'Trường :attribute không hợp lệ'
@@ -125,10 +133,20 @@ class AddressController extends Controller
             
             DB::commit();
             
+            if(!empty($input['use_form'])) {
+                return HelpersResponse::successAndRedirect(null, 'Thêm địa chỉ thành công');
+            }
+            
+            
             return HelpersResponse::success("Submit thành công");
         } catch (\Throwable $th) {
             DB::rollback();
             Log::error("AddressController::store" ,['exception' => $th]);
+            
+            if(!empty($input['use_form'])) {
+                return HelpersResponse::failAndRedirect(null, 'Thêm địa chỉ thất bại');
+            }
+            
             return HelpersResponse::fail("Submit thất bại", 500);
         }
     }
@@ -141,7 +159,7 @@ class AddressController extends Controller
             'district_id' => ['required'],
             'ward_id' => ['required'],
             'user_id' => ['required'],
-            'is_defaut' => ['required', 'in:0,1'],
+            'is_default' => ['required', 'in:0,1'],
         ], [
             'required' => 'Trường :attribute là bắt buộc',
             'in' => 'Trường :attribute không hợp lệ'
@@ -175,9 +193,18 @@ class AddressController extends Controller
     
     public function getAddress(Request $request, $id) {
         $query = Address::query();
-        
         $query->where('id', $id);
         
+        $data = $query->first();
+        
+        return HelpersResponse::success("Get dữ liệu thành công", $data);
+    }
+    
+    public function getAddressDefault123(Request $request) {
+        $user_id = $request->user_id;  
+        $query = Address::query()->with(['city', 'district', 'ward']);
+        $query->where('user_id', $user_id);
+        $query->where('is_default', 1);
         $data = $query->first();
         
         return HelpersResponse::success("Get dữ liệu thành công", $data);
@@ -201,21 +228,25 @@ class AddressController extends Controller
     
     public function updateDefault(Request $request ,$id) {
         $input = $request->all();      
-        if(empty($input['user_id'])) {
-            return HelpersResponse::fail("Vui lòng nhập user_id");
-        }
+        // if(empty($input['user_id'])) {
+        //     return HelpersResponse::fail("Vui lòng nhập user_id");
+        // }
+        $input['user_id'] = auth()->user()->id;
+        
+        
         try {
             DB::beginTransaction();
             Address::where('user_id', $input['user_id'])->update([
-                'is_defaut' => 0
+                'is_default' => 0
             ]);
             
             $address = Address::find($id);
             
             $address->update([
-                'is_defaut' => 1
-            ]);   
+                'is_default' => 1
+            ]); 
             
+            // $cartService->
             
             DB::commit();
             return HelpersResponse::success("Cập nhật trạng thái thành công");

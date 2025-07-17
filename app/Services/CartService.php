@@ -26,7 +26,7 @@ class CartService {
         $query = $this->cartRepository->query()->with([
             'cartDetail',  
             'cartDetail.product' => function ($q) {
-                $q->select('id', 'name', 'image_avatar', 'slug');
+                $q->select('id', 'name', 'image_avatar', 'slug', 'price', 'original_price');
             }
         ]);
         
@@ -49,7 +49,7 @@ class CartService {
             ];
             $this->createCart($input);
         }
-        
+        $this->syncCart();
         return $this->cart;
     }
     
@@ -93,14 +93,16 @@ class CartService {
             $cartDetail = new CartDetail();
             $cartDetail->cart_id = $cart_id;
             $cartDetail->product_id = $product_id;
+            $cartDetail->quantity = 0;
         }
         
-        $cartDetail->quantity = $input['quantity'] ?? $cartDetail->quantity;
-        $cartDetail->price = $product->original_price ?? $product->price;
-        $cartDetail->final_price = $product->price;
+        $cartDetail->quantity = $cartDetail->quantity + $input['quantity'];
+        $cartDetail->price = $product->price;
+        $cartDetail->final_price = $cartDetail->quantity * $product->price;
         
         $cartDetail->save();
         
+        $this->syncCart();
         $this->getCart();
         
         return true;
@@ -113,9 +115,75 @@ class CartService {
             return $this->address;
         }
         
-        $this->address = Address::where('user_id', $user_id)->where('is_defaut', 1)->first();
+        $this->address = Address::where('user_id', $user_id)->where('is_default', 1)->first();
         
         return $this->address;
     }
+    
+    public function syncCart() {
+        $user_id = auth()->user()->id ?? null;
+        
+        if(!$this->cart) {
+            $this->getCart();
+        }
+        
+        [$total_price, $final_price] = $this->updateTotalPrice();
+        
+        // cập nhật bảng cart
+        $this->cart->total_price = $total_price;
+        $this->cart->final_price = $final_price;
+        // $this->cart->address_id = $address_id;
+        $this->cart->save();
+        
+    }
+    
+    public function updateTotalPrice() {
+        $total_price = 0;
+        $final_price = 0;
+        $cartDetails = $this->cart->cartDetail;
+        
+        foreach($cartDetails as $detail) {
+            $totalPriceByProduct = $detail->final_price;
+            $total_price += $totalPriceByProduct;
+            $final_price += $totalPriceByProduct;
+        }        
+        
+        return [
+            $total_price,
+            $final_price,
+        ];
+    }
+    
+    public function updateCartDetail($input = []) {
+        if(!$this->cart) {
+            $this->getCart();
+        }
+        
+        $detail_id = $input['detail_id'] ?? null;
+        $quantity = $input['quantity'] ?? 1;
+        
+        $cartDetail = $this->cart->cartDetail->where('id', $detail_id)->first();
+        
+        $cartDetail->quantity = $input['quantity'];
+        $cartDetail->final_price = $cartDetail->quantity * $cartDetail->price;
+        $cartDetail->save();
+        
+        $this->syncCart();
+        $this->getCart();
+        
+        return true;
+    }
+    
+    public function deleteCartDetail($id) {
+        if(!$this->cart) {
+            $this->getCart();
+        }
+        
+        $cartDetail = $this->cart->cartDetail->where('id', $id)->first();
+        $cartDetail->delete();
+        
+        return true;
+    }
+    
     
 }

@@ -7,6 +7,7 @@ import { router, usePage } from '@inertiajs/vue3'
 import ModalAddress from '@/Components/Lib/ModalAddress.vue'
 import AddressApi from '@/Api/AddressApi'
 import loadingManager from '@/libs/LoadingManager'
+import OrderDataTable from '@/Components/Client/OrderDataTable.vue'
 
 // Dùng layout riêng cho trang này
 defineOptions({
@@ -46,7 +47,7 @@ onMounted(async () => {
 
 const handleUpdateAddressModel = (id) => {
   idAddress.value = id;
-  modal.value = true;
+  // modal.value = true;
 }
 
 const updateAddressDefault = async (id) => {
@@ -112,7 +113,7 @@ const deleteAddress = async (id) => {
       <!-- Tabs -->
       <v-tabs v-model="tab" class="mt-6" color="primary">
         <v-tab value="work">Địa chỉ</v-tab>
-        <v-tab value="moodboards">Moodboards</v-tab>
+        <v-tab value="listOrder">Đơn hàng</v-tab>
       </v-tabs>
     </v-card>
 
@@ -146,11 +147,11 @@ const deleteAddress = async (id) => {
                           Cập nhật
                         </v-btn>
                         
-                        <v-btn variant="outlined" color="gray" class="m-2" size="small" :disabled="address.is_defaut == 1" @click="updateAddressDefault(address.id)">
+                        <v-btn variant="outlined" color="gray" class="m-2" size="small" :disabled="address.is_default == 1" @click="updateAddressDefault(address.id)">
                           Thiết lập mặc định
                         </v-btn>
                         
-                        <v-btn color="red" @click="deleteAddress(address.id)" class="m-2" size="small" v-if="address.is_defaut == 0">
+                        <v-btn color="red" @click="deleteAddress(address.id)" class="m-2" size="small" v-if="address.is_default == 0">
                           Xóa địa chỉ
                         </v-btn>
                       </v-col>
@@ -161,8 +162,10 @@ const deleteAddress = async (id) => {
               
             </v-row>
           </v-window-item>
-          <v-window-item value="moodboards">
-            <div>Nội dung tab Moodboards...</div>
+          <v-window-item value="listOrder">
+            <div>
+              <OrderDataTable />
+            </div>
           </v-window-item>
         </v-window>
       </v-card-text>

@@ -15,4 +15,20 @@ class Response {
             'message'=> $message,
         ], $status);
     }
+    
+    public static function successAndRedirect($to = null, $message = '') {
+        if($to) {
+            return redirect()->route($to)->with('success', $message);  
+        }
+        
+        return redirect()->back()->with('success', $message);
+    }
+    
+    public static function failAndRedirect($to = null, $message = '') {
+        if($to) {
+            return redirect()->route($to)->with('error', $message);  
+        }
+        
+        return redirect()->back()->with('error', $message);
+    }
 }

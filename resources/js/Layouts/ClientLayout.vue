@@ -1,5 +1,5 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import Toast from '@/Components/Errors/Toast.vue'
 import { ref, onMounted, reactive, computed } from 'vue'
 import toastManager from '@/libs/toast';
@@ -10,6 +10,7 @@ import CategoryApi from '@/Api/CategoryApi';
 import AppLoading from '@/Components/Lib/AppLoading.vue';
 import loadingManager from '@/libs/LoadingManager';
 import SearchBar from '@/Components/Client/SearchBar.vue';
+import Footer from './Footer.vue';
 
 const toastRef = ref(null)
 const page = usePage()
@@ -40,6 +41,12 @@ const isOpen = ref(false)
 const categories = reactive([]);
 
 const user = computed(() => page.props?.auth?.user)
+
+const handleOnclickDanhMuc = (item) => {
+    isOpen.value = !isOpen.value;
+    
+    router.visit(route('client.category', {slug: item?.slug}));
+}
 
 </script>
 
@@ -79,7 +86,7 @@ const user = computed(() => page.props?.auth?.user)
                                 <v-btn icon="mdi-cart" class="text-none"></v-btn>
                             </Link>
                             <Link :href="route('client.profile')">
-                                <v-btn  prepend-icon="mdi-account" class="text-none mr-3">{{ user.name }}</v-btn>
+                                <v-avatar :image="user.avatar"></v-avatar>
                             </Link>
                         </template>
                         <template v-else>
@@ -102,6 +109,8 @@ const user = computed(() => page.props?.auth?.user)
             <slot />
         </v-main>
         
+        <Footer />
+        
         <!-- Toast để cuối -->
         <Toast ref="toastRef" />
         <AppLoading ref="loadingRef" />
@@ -122,6 +131,7 @@ const user = computed(() => page.props?.auth?.user)
                     v-for="item in categories"
                     :key="item.id"
                     class="flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer"
+                    @click="handleOnclickDanhMuc(item)"
                 >
                     <!-- <v-icon class="mr-3" size="22">{{ item.icon }}</v-icon> -->
                     <span class="flex-1 text-sm text-gray-800 font-medium">{{ item.name }}</span>

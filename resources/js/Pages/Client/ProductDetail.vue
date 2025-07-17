@@ -15,7 +15,7 @@ defineOptions({
 
 const page = usePage()
 const user = computed(() => page.props?.auth?.user || null)
-
+const fullUrl = window.location.href;
 
 const props = defineProps({
   product: {
@@ -175,6 +175,14 @@ const tab = ref("MoTa")
                     >
                         <v-container fluid>
                             <div v-html="product.description"></div>
+                        </v-container>
+                    </v-tabs-window-item>
+                    
+                    <v-tabs-window-item
+                        value="BinhLuan"
+                    >
+                        <v-container fluid>
+                            <div class="fb-comments" :data-href="fullUrl" data-width="100%" data-numposts="10"></div>
                         </v-container>
                     </v-tabs-window-item>
                 </v-tabs-window>
